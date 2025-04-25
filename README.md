@@ -26,6 +26,9 @@ echo -n '{"link":{"host": "cloud.tenable.com","port": 443,"key": "YOUR TENABLE K
 2. Insert the base64 encoded string in the [secrets.yaml](https://github.com/RocketChat/tenable-agent-kubernetes-daemonset/blob/main/secrets.yaml) file and use kubeseal to encrypt it:
 
 ```
+#Install Sealed Secrets via Helm - https://yuki-nakamura.com/2023/07/30/install-sealed-secrets-via-helm/
+# Install seal secrets via manifest files - https://eksworkshop.com/docs/security/secrets-management/sealed-secrets/installing-sealed-secrets
+
 cat secret.yaml | kubeseal \
     --controller-namespace kube-system \
     --controller-name sealed-secrets \
