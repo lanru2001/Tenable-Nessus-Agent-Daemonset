@@ -1,0 +1,13 @@
+# nessus-config.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: nessus-agent-config
+  namespace: tenable
+data:
+  nessus-service.conf: |
+    # Tenable Nessus Agent Configuration
+    host = cloud.tenable.com
+    port = 443
+    ssl_verify = yes
+    auto_update = yes
