@@ -1,0 +1,57 @@
+# nessus-daemonset.yaml
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: nessus-agent
+  namespace: tenable
+  labels:
+    app: nessus-agent
+spec:
+  selector:
+    matchLabels:
+      app: nessus-agent
+  template:
+    metadata:
+      labels:
+        app: nessus-agent
+    spec:
+      hostNetwork: true
+      hostPID: true
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: nessus-agent
+        image: tenable/nessus-agent:latest
+        securityContext:
+          privileged: true
+        env:
+        - name: NESSUS_LINKING_KEY
+          valueFrom:
+            secretKeyRef:
+              name: nessus-agent-secret
+              key: linking-key
+        - name: NESSUS_GROUPS
+          value: "eks-cluster"
+        volumeMounts:
+        - name: config-volume
+          mountPath: /opt/nessus_agent/etc/nessus/nessus-service.conf
+          subPath: nessus-service.conf
+        - name: data-volume
+          mountPath: /opt/nessus_agent/var/nessus
+      volumes:
+      - name: config-volume
+        configMap:
+          name: nessus-agent-config
+          items:
+          - key: nessus-service.conf
+            path: nessus-service.conf
+      - name: data-volume
+        hostPath:
+          path: /var/nessus
+          type: DirectoryOrCreate
+      tolerations:
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/master
+        operator: Exists
+      - effect: NoSchedule
+        key: node-role.kubernetes.io/control-plane
+        operator: Exists
